@@ -1,8 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "start": "tsx server.ts",
-    "server": "nodemon --exec tsx server.ts",
+    "start": "node dist/server.js",
+    "dev": "nodemon --exec tsx server.ts",
     "build": "tsc"
   },
   "dependencies": {
