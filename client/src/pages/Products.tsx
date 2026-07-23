@@ -56,6 +56,7 @@ export const Products = () => {
   }
 
   useEffect(() => {
+    scrollTo(0,0)
     fetchProducts();
   }, [category, minPrice, maxPrice, sort, organic, page])
 
