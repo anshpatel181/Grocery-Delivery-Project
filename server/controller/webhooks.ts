@@ -4,7 +4,7 @@ import { prisma } from "../config/prisma.js";
 import { inngest } from "../inngest/index.js";
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET
-const stripe = new Stripe(process.env.STRIPE__SECRET_KEY as string)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
 
 export const stripeWebhook = async (request: Request, response: Response) => {
     let event;
@@ -70,7 +70,7 @@ export const stripeWebhook = async (request: Request, response: Response) => {
                 await prisma.order.delete({where: {id: failureOrderId}})
                 break;
             }
-            
+
             default:
                 console.log(`Unhandled event type ${event.type}`);
         }
