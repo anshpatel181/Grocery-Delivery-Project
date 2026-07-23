@@ -10,7 +10,6 @@ export const createOrder = async (req: Request, res: Response) => {
     if (!items || items.length === 0) return res.status(400).json({ message: "No order items" })
 
     // look up actual prices from the database
-    console.log(items);
 
     const productIds = items.map((item: any) => item.product)
     const products = await prisma.product.findMany({ where: { id: { in: productIds } } })
@@ -58,7 +57,7 @@ export const createOrder = async (req: Request, res: Response) => {
             statusHistory: [{ status: "Placed", note: "Order Placed Successfully", timeStamp: new Date() }],
         }
     })
-
+    
     if (paymentMethod === "card") {
 
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
@@ -82,7 +81,7 @@ export const createOrder = async (req: Request, res: Response) => {
             mode: 'payment',
             metadata: {orderId: order.id}
         });
-
+        
         return res.json({url: session.url})
     }
 

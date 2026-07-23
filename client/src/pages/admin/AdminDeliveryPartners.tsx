@@ -13,7 +13,7 @@ export default function AdminDeliveryPartners() {
     const [form, setForm] = useState({ name: "", email: "", password: "", phone: "", vehicleType: "bike" });
 
     const fetchPartners = async () => {
-        try {   
+        try {
             const { data } = await api.get('/admin/delivery-partners')
 
             setPartners(data.deliveryPartners) //.filter((p: DeliveryPartner) => p.isActive)
@@ -32,28 +32,31 @@ export default function AdminDeliveryPartners() {
     const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
 
+        setSaving(true)
         try {
             await api.post("/admin/create-partner", form)
             toast.success("Delivery partner created successfully")
             fetchPartners()
         } catch (error: any) {
-            toast.success("Error creating delivery partner")
+            toast.error("Error creating delivery partner")
             console.error(error.response?.data?.message || error.message);
         } finally {
             setShowForm(false)
-            setForm({name: "", email: "", password: "", phone: "", vehicleType: "bike"})
+            setForm({ name: "", email: "", password: "", phone: "", vehicleType: "bike" })
+            setSaving(false)
         }
 
     };
 
     const toggleActive = async (id: string, isActive: boolean) => {
-        
+
         try {
-            await api.put(`/admin/delivery-partners/${id}`, {isActive: !isActive})
+            await api.put(`/admin/delivery-partners/${id}`, { isActive: !isActive })
             fetchPartners()
             toast.success(`Partner ${isActive ? "Partner Activated" : "Partner Deactivated"}`)
-        } catch (error) {
-            
+        } catch (error: any) {
+            console.log(error.message);
+            toast.error(error.response?.data?.message || error.message || `Failed to ${isActive ? "Deactivate Partner" : "Activate Partner"}`)
         }
     };
 

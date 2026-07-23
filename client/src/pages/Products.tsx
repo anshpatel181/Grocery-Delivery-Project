@@ -1,4 +1,4 @@
-import { ArrowRightIcon, ChevronDown, HomeIcon, SlidersHorizontalIcon, XIcon } from "lucide-react"
+import { ChevronDown, HomeIcon, SlidersHorizontalIcon, XIcon } from "lucide-react"
 import { Link, useSearchParams } from "react-router-dom"
 import type { Product } from "../types/types"
 import { useEffect, useState } from "react"

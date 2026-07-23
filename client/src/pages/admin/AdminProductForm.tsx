@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "lucide-react";
-import { categoriesData, products } from "../../assets/assets";
+import { categoriesData } from "../../assets/assets";
 import { Loading } from "../../components/Loading";
-import axios from "axios";
 import api from "../../config/api";
 import toast from "react-hot-toast";
 
@@ -14,7 +13,6 @@ export default function AdminProductForm() {
     const [loading, setLoading] = useState(isEdit);
     const [saving, setSaving] = useState(false);
     const [imageFile, setImageFile] = useState<File | null>(null);
-    const base_url = import.meta.env.VITE_BACKEND_URL
 
     const [formData, setFormData] = useState({
         name: "",

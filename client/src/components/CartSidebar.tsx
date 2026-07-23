@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 export const CartSidebar = () => {
 
     const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$"
-    const { items, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal, isCartOpen, setIsCartOpen } = useCart();
+    const { items, removeFromCart, updateQuantity, cartTotal, isCartOpen, setIsCartOpen } = useCart();
     const navigate = useNavigate();
 
     if (!isCartOpen) return null;

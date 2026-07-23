@@ -1,5 +1,5 @@
 
-export const FilterPanel = ({ categories, category, organic, minPrice, maxPrice, clearFilters, updateFilter, hasFilters, mobileFiltersOpen }: any) => {
+export const FilterPanel = ({ categories, category, minPrice, maxPrice, clearFilters, updateFilter, hasFilters }: any) => {
 
   const categoriesWithAll = [{ slug: "", name: "All Categories" }, ...categories]
   return (

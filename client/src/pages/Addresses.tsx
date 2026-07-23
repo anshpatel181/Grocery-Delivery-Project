@@ -1,4 +1,4 @@
-import { CheckIcon, LogIn, MapPin, MapPinIcon, PencilIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react"
+import { CheckIcon, MapPin, MapPinIcon, PencilIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import type { Address } from "../types/types"
 import { Loading } from "../components/Loading"
@@ -12,8 +12,6 @@ export const Addresses = () => {
   const [addresses, setAddresses] = useState<Address[]>([])
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [lat, setLat] = useState<Number | null>(null)
-  const [lng, setLng] = useState<Number | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     label: "",

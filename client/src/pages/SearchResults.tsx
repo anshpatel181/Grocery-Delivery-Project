@@ -5,6 +5,7 @@ import { HomeIcon, SearchIcon } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import api from "../config/api";
 import toast from "react-hot-toast";
+import { Loading } from "../components/Loading";
 
 export const SearchResults = () => {
 
@@ -25,6 +26,8 @@ export const SearchResults = () => {
     }).finally(() => setIsLoading(false))
 
   }, [query])
+
+  if(isLoading) return <Loading />
 
   return (
     <div className="min-h-screen">

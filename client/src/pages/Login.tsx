@@ -1,21 +1,18 @@
 import { BikeIcon, LockIcon, MailIcon, UserIcon } from "lucide-react"
 import { assets } from "../assets/assets"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import React, { useEffect, useState } from "react"
-import axios from "axios"
 import toast from "react-hot-toast"
 import { useAuth } from "../context/AuthContext"
 
 export const Login = () => {
 
-  const BASE_URL = import.meta.env.VITE_BACKEND_URL
   const {login, register} = useAuth()
   const [isLogin, setIsLogin] = useState(true)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
@@ -89,7 +86,7 @@ export const Login = () => {
               <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter password" required className="w-full border text-sm not-focus:border-gray-200 bg-white rounded-xl pl-10 pr-4 py-3 transition-all" />
             </div>
 
-            <button type="submit" className="flex items-center justify-center font-semibold border rounded-xl bg-green-950 hover:bg-green-900 transition-colors disabled:opacity-50 text-white py-3 w-full cursor-pointer">{isLogin ? "Sign In" : "Sign Up"}</button>
+            <button disabled={loading} type="submit" className="flex items-center justify-center font-semibold border rounded-xl bg-green-950 hover:bg-green-900 transition-colors disabled:opacity-50 text-white py-3 w-full cursor-pointer">{isLogin ? loading ? "Signing  in..." : "Sign In" : loading ? "Signing Up..." : "Sign Up"}</button>
           </form>
         </div>
       </div>

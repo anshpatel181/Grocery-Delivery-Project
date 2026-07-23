@@ -4,6 +4,7 @@ import { PackageIcon, UsersIcon, ShoppingBagIcon, AlertTriangleIcon } from "luci
 import { Loading } from "../../components/Loading";
 import { statusColors } from "../../assets/assets";
 import api from "../../config/api";
+import toast from "react-hot-toast";
 
 interface Stats {
     totalOrders: number;
@@ -24,7 +25,8 @@ export default function AdminDashboard() {
         api.get("/admin/stats").then(({ data }) => {
             setStats(data)
         }).catch((error: any) => {
-
+            console.log(error.message);
+            toast.error(error.response?.data?.message || error.message || "Failed to load stats")
         }).finally(() => setLoading(false))
     }, []);
 

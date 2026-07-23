@@ -20,8 +20,9 @@ export const MyOrders = () => {
   const { clearCart } = useCart();
 
   const fetchOrders = async () => {
-    try {
 
+    setLoading(true)
+    try {
       const { data } = await api.get(`/orders?status=${activeTab}`)
       setOrders(data.orders)
     } catch (error: any) {
@@ -43,7 +44,6 @@ export const MyOrders = () => {
     else {
       fetchOrders()
     }
-    setLoading(false)
   }, [activeTab])
 
   return (
@@ -83,7 +83,7 @@ export const MyOrders = () => {
                         <p className="font-medium text-sm text-app-green">Order #{order.id.slice(-8).toUpperCase()}</p>
                         <div className="flex items-center gap-2 mt-1">
                           <Calendar className="size-3 text-app-text-light" />
-                          <span className="text-xs text-app-text-light"> {new Date(order.createdAt).toLocaleDateString("en-us", { month: "short", day: "numeric", year: "numeric" })}</span>
+                          <span className="text-xs text-app-text-light"> {new Date(order.createdAt).toLocaleTimeString("en-us", { month: "short", day: "numeric", year: "numeric" })}</span>
                         </div>
                       </div>
 
