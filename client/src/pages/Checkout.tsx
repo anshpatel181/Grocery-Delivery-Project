@@ -1,23 +1,90 @@
 import { useState } from "react"
 import { useCart } from "../context/CartContext"
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeftIcon, CheckIcon, ChevronRightIcon, CreditCardIcon, MapPin, MinusIcon, PlusIcon, TruckIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeftIcon, CheckIcon, ChevronRightIcon, CreditCardIcon, MapPin } from "lucide-react";
 import type { Address } from "../types/types";
+import api from "../config/api";
+import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
+import CheckoutAddress from "../components/Checkout/CheckoutAddress";
+import CheckoutPayment from "../components/Checkout/CheckoutPayment";
+import CheckoutReview from "../components/Checkout/CheckoutReview";
 
 export const Checkout = () => {
 
   const [activeTab, setActiveTab] = useState("Address")
-  const { items, cartTotal } = useCart();
-  const [addresses, setAddresses] = useState<Address[]>([])
-  const [activePaymentMethod, setActivePaymentMethod] = useState("CARD")
+  const { items, cartTotal, clearCart } = useCart();
+  const { user } = useAuth();
+  const [activePaymentMethod, setActivePaymentMethod] = useState("card")
   const currency = import.meta.env.VITE_CURRENCY_SYMBOL
   const deliveryFee = cartTotal > 20 ? 0 : 1.99
   const tax = cartTotal * 0.08
   const grandTotal = cartTotal + deliveryFee + tax
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false)
+  const [address, setAddress] = useState<Address>({
+    id: "",
+    label: "Home",
+    address: "",
+    city: "",
+    state: "",
+    zip: "",
+    isDefault: false,
+    lat: 0,
+    lng: 0
+  })
 
   const tabs = [{ icon: MapPin, text: "Address", icon2: ChevronRightIcon }, { icon: CreditCardIcon, text: "Payment", icon2: ChevronRightIcon }, { icon: CheckIcon, text: "Review", icon2: "" }]
-  const paymentMethods = [{ method: "CARD", text: "Credit / Debit Card", description: "Pay securely with your card" }, { method: "COD", text: "Cash on Delivery", description: "Pay when you receive" }]
+  const paymentMethods = [{ method: "card", text: "Credit / Debit Card", description: "Pay securely with your card" }, { method: "COD", text: "Cash on Delivery", description: "Pay when you receive" }]
+
+  const handlePlaceOrder = async () => {
+
+    setLoading(true)
+    try {
+      const orderData = {
+        items: items.map((item) => ({
+          product: item.product.id,
+          quantity: item.quantity
+        })), 
+        shippingAddress: address,
+        paymentMethod: activePaymentMethod
+      }
+
+      const {data} = await api.post("/orders", orderData)
+      console.log(data);
+      
+      if(data.url) {
+        window.location.href = data.url
+        return;
+      }
+
+      toast.success("Order placed successfully")
+      clearCart()
+      navigate(`/orders/${data.order.id}`)
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || error.message)
+    } finally {
+      setLoading(false)
+      scrollTo(0,0)
+    }
+  }
+
+  useState(() => {
+    if (user?.addresses?.length) {
+      const defaultAddr = user.addresses.find((add) => add.isDefault) || user.addresses[0]
+      setAddress({
+        id: defaultAddr.id,
+        label: defaultAddr.label,
+        address: defaultAddr.address,
+        city: defaultAddr.city,
+        state: defaultAddr.state,
+        zip: defaultAddr.zip,
+        isDefault: defaultAddr.isDefault,
+        lat: defaultAddr.lat,
+        lng: defaultAddr.lng
+      })
+    }
+  })
 
   return (
     <div className="min-h-screen">
@@ -59,75 +126,18 @@ export const Checkout = () => {
               {/* left side */}
               {
                 activeTab === "Address" &&
-                <div className="bg-white rounded-xl p-5">
-                  <p className="flex items-center font-semibold gap-1.5 text-app-green text-lg mb-5"><MapPin className="size-4" /> Delivery Address</p>
-                  {
-                    addresses.length > 0 &&
-                    (
-                      <>
-                        <p className="mb-3 text-sm text-app-green">Saved Addresses</p>
-                        <div className="grid grid-cols-2 gap-2">
-                        </div>
-                      </>
-                    )
-                  }
-                  <Link to="/addresses" className="border rounded-lg flex items-center justify-center py-2.5 px-4 text-app-green-lighter gap-2">Add New Address <PlusIcon className="size-4" /></Link>
-                  <button disabled={addresses.length === 0} className="flex items-center gap-2 rounded-xl mt-6 px-6 py-3 font-semibold bg-app-green text-white enabled:hover:bg-app-green-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed" onClick={() => addresses.length > 0 && setActiveTab(tabs[1].text)}>Continue to Payment <ChevronRightIcon className="size-4" /></button>
-                </div>
+                <CheckoutAddress user={user} address={address} setAddress={setAddress} setActiveTab={setActiveTab} />
               }
 
               {/* active tab is payment method selection */}
               {
                 activeTab === "Payment" &&
-                <div className="bg-white rounded-xl p-5">
-                  <p className="flex items-center font-semibold gap-1.5 text-app-green text-lg mb-5"><CreditCardIcon className="size-4" /> Payment Method</p>
-                  <div className="space-y-3">
-                    {
-                      paymentMethods.map((paymentMeth, index) => (
-                        <label className={`p-4 flex items-center gap-4 rounded-xl border border-app-border cursor-pointer transition-all hover:border-app-green-lighter ${paymentMeth.method === activePaymentMethod && "bg-app-cream border-app-green"}`} onClick={() => setActivePaymentMethod(paymentMeth.method)} key={index}>
-                          <input type="radio" className="size-4 text-app-green" checked={paymentMeth.method === activePaymentMethod} />
-                          <div>
-                            <p className="text-sm font-semibold text-app-green">{paymentMeth.text}</p>
-                            <p className="text-xs text-app-text-light">{paymentMeth.description}</p>
-                          </div>
-                        </label>
-                      ))
-                    }
-                  </div>
-
-                  <button className="flex items-center gap-2 rounded-xl mt-6 px-6 py-3 font-semibold bg-app-green text-white enabled:hover:bg-app-green-light transition-colors" onClick={() => setActiveTab(tabs[2].text)}>Review Order <ChevronRightIcon className="size-4" /></button>
-                </div>
+                <CheckoutPayment paymentMethods={paymentMethods} activePaymentMethod={activePaymentMethod} setActivePaymentMethod={setActivePaymentMethod} setActiveTab={setActiveTab} />
               }
 
               {
                 activeTab === "Review" &&
-                <div className="bg-white rounded-xl p-5">
-                  <p className="flex items-center font-semibold gap-1.5 text-app-green text-lg mb-5"><CheckIcon className="size-4" /> Review Your Order</p>
-                  <div className="mb-5 p-4 bg-app-cream rounded-xl">
-                    <div className="flex items-center gap-2 mb-2">
-                      <TruckIcon className="size-4" />
-                      <span className="text-sm font-semibold text-app-green">Delivery Address</span>
-                    </div>
-                    <p className="text-app-text-light text-sm flex items-end gap-0.5">Home <MinusIcon className="size-4" /> 304, Nilgiri heights, panchvati area, Kalol, Gujarat 382721</p>
-                  </div>
-
-                  <div className="space-y-3 mb-5">
-                    {
-                      items.map((item, index) => (
-                        <div className="flex items-center gap-3" key={index}>
-                          <img src={item.product.image} alt={item.product.image} className="size-12 object-contain rounded-lg" />
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-app-green">{item.product.name}</p>
-                            <p className="text-xs text-app-text-light">Qty:{item.quantity}</p>
-                          </div>
-                          <span className="text-sm font-semibold text-app-green">{currency}{item.product.price.toFixed(2)}</span>
-                        </div>
-                      ))
-                    }
-                  </div>
-
-                  <button className="w-full rounded-xl flex items-center justify-center mt-6 py-3 font-semibold bg-app-orange text-white hover:bg-app-orange-dark transition-colors disabled:opacity-60 active:scale-[0.98]" onClick={() => setActiveTab(tabs[2].text)}>Place Order <MinusIcon /> {currency}{grandTotal.toFixed(2)}</button>
-                </div>
+                <CheckoutReview items={items} currency={currency} grandTotal={grandTotal} handlePlaceOrder={handlePlaceOrder} loading={loading} address={address} />
               }
 
             </div>

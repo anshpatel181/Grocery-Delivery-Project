@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { PlusIcon, XIcon, TruckIcon, PhoneIcon, MailIcon } from "lucide-react";
 import { Loading } from "../../components/Loading";
-import { dummyDeliveryPartnerData } from "../../assets/assets";
 import type { DeliveryPartner } from "../../types/types";
+import api from "../../config/api";
+import toast from "react-hot-toast";
 
 export default function AdminDeliveryPartners() {
     const [partners, setPartners] = useState<DeliveryPartner[]>([]);
@@ -12,8 +13,16 @@ export default function AdminDeliveryPartners() {
     const [form, setForm] = useState({ name: "", email: "", password: "", phone: "", vehicleType: "bike" });
 
     const fetchPartners = async () => {
-        setPartners(dummyDeliveryPartnerData as any)
-        setTimeout(() => setLoading(false), 1000)
+        try {   
+            const { data } = await api.get('/admin/delivery-partners')
+
+            setPartners(data.deliveryPartners) //.filter((p: DeliveryPartner) => p.isActive)
+        } catch (error: any) {
+            toast.error("Failed to fetch partners")
+            console.error(error.response?.data?.message || error.message)
+        } finally {
+            setLoading(false)
+        }
     };
 
     useEffect(() => {
@@ -23,10 +32,29 @@ export default function AdminDeliveryPartners() {
     const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
 
+        try {
+            await api.post("/admin/create-partner", form)
+            toast.success("Delivery partner created successfully")
+            fetchPartners()
+        } catch (error: any) {
+            toast.success("Error creating delivery partner")
+            console.error(error.response?.data?.message || error.message);
+        } finally {
+            setShowForm(false)
+            setForm({name: "", email: "", password: "", phone: "", vehicleType: "bike"})
+        }
+
     };
 
     const toggleActive = async (id: string, isActive: boolean) => {
-        console.log(id, isActive);
+        
+        try {
+            await api.put(`/admin/delivery-partners/${id}`, {isActive: !isActive})
+            fetchPartners()
+            toast.success(`Partner ${isActive ? "Partner Activated" : "Partner Deactivated"}`)
+        } catch (error) {
+            
+        }
     };
 
     if (loading) return <Loading />;
@@ -50,7 +78,7 @@ export default function AdminDeliveryPartners() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {partners.map((p) => (
-                        <div key={p._id} className="bg-white rounded-2xl border border-app-border p-5 space-y-3">
+                        <div key={p.id} className="bg-white rounded-2xl border border-app-border p-5 space-y-3">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="size-10 rounded-full bg-app-green flex-center">
@@ -69,7 +97,7 @@ export default function AdminDeliveryPartners() {
                                 <p className="flex items-center gap-2"><MailIcon className="w-3.5 h-3.5 text-zinc-400" /> {p.email}</p>
                                 <p className="flex items-center gap-2"><PhoneIcon className="w-3.5 h-3.5 text-zinc-400" /> {p.phone}</p>
                             </div>
-                            <button onClick={() => toggleActive(p._id, p.isActive)} className={`w-full py-2 text-xs font-medium rounded-lg transition-colors ${p.isActive ? "bg-red-50 text-red-600 hover:bg-red-100" : "bg-green-50 text-green-600 hover:bg-green-100"}`}>
+                            <button onClick={() => toggleActive(p.id, p.isActive)} className={`w-full py-2 text-xs font-medium rounded-lg transition-colors ${p.isActive ? "bg-red-50 text-red-600 hover:bg-red-100" : "bg-green-50 text-green-600 hover:bg-green-100"}`}>
                                 {p.isActive ? "Deactivate" : "Activate"}
                             </button>
                         </div>

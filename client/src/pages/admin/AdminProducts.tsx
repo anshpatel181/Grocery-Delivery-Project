@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { PlusIcon, EditIcon, XIcon } from "lucide-react";
 import { Loading } from "../../components/Loading";
-import { products } from "../../assets/assets";
 import type { Product } from "../../types/types";
-import axios from "axios";
+import api from "../../config/api";
+import toast from "react-hot-toast";
 
 export default function AdminProducts() {
 
@@ -12,23 +12,18 @@ export default function AdminProducts() {
 
     const [productsData, setProductsData] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
-    const token = localStorage.getItem("auth_token")
-    const base_url = import.meta.env.VITE_BACKEND_URL
-
-    localStorage.setItem("auth_token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZkNTQxYzI2LTc1YTItNDZjZi1hODQ5LTI0ODQ2YWFjYWEwNSIsImlhdCI6MTc4NDA1NzA4MCwiZXhwIjoxNzg2NjQ5MDgwfQ.TdRx4NgfiZ5vnqO7bKooiAh50BhgasLEwACu93aBXNM")
 
     const fetchProducts = async () => {
-        
-        const data = await axios.get(base_url + "/products/allProducts", {
-            headers: { Authorization: `Bearer ${token}` },
-        })
 
-        console.log(data)
-
-        // setProductsData(products);
-        setTimeout(() => {
-            setLoading(false);
-        }, 1000);
+        try {
+            const {data} = await api.get("/products")
+            setProductsData(data.products)  
+        } catch (error: any) {
+            console.error(error.message);
+            toast.error(error.response?.data?.message || error.message);
+        } finally {
+            setLoading(false)
+        } 
     };
 
     useEffect(() => {
@@ -37,7 +32,14 @@ export default function AdminProducts() {
 
     const handleMarkOutOfStock = async (id: string, name: string) => {
         if (!window.confirm(`Are you sure you want to mark "${name}" as out of stock?`)) return;
-        console.log(id);
+        
+        try {            
+            await api.delete(`/products/${id}`)
+            fetchProducts();
+            toast.success(`Product ${name} marked as out of stock`)
+        } catch (error) {
+            
+        }
     };
 
     if (loading) return <Loading />
@@ -68,10 +70,10 @@ export default function AdminProducts() {
                                 </tr>
                             ) : (
                                 productsData.map(product => (
-                                    <tr key={product._id} className="hover:bg-zinc-50/50 transition-colors">
+                                    <tr key={product.id} className="hover:bg-zinc-50/50 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
-                                                <img src={product.image} alt={product.name} className="size-12 rounded-lg object-cover" />
+                                                <img src={product.image} alt={product.name} className="size-15 rounded-lg object-contain" />
                                                 <div>
                                                     <p className="font-semibold text-zinc-900">{product.name}</p>
                                                     <p className="text-xs text-zinc-500">{product.category || "Uncategorized"}</p>
@@ -86,10 +88,10 @@ export default function AdminProducts() {
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                <Link to={`/admin/products/${product._id}/edit`} className="p-2 text-zinc-500 hover:text-app-orange bg-zinc-100 hover:bg-orange-50 rounded-lg transition-colors">
+                                                <Link to={`/admin/products/${product.id}/edit`} className="p-2 text-zinc-500 hover:text-app-orange bg-zinc-100 hover:bg-orange-50 rounded-lg transition-colors">
                                                     <EditIcon className="size-4" />
                                                 </Link>
-                                                <button onClick={() => handleMarkOutOfStock(product._id, product.name)} title="Mark Out of Stock" className="p-2 text-zinc-500 hover:text-red-600 bg-zinc-100 hover:bg-red-50 rounded-lg transition-colors">
+                                                <button onClick={() => handleMarkOutOfStock(product.id, product.name)} title="Mark Out of Stock" className="p-2 text-zinc-500 hover:text-red-600 bg-zinc-100 hover:bg-red-50 rounded-lg transition-colors">
                                                     <XIcon className="size-4" />
                                                 </button>
                                             </div>

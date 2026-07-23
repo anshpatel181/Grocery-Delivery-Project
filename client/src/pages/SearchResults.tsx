@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom"
 import type { Product } from "../types/types";
-import { products } from "../assets/assets";
 import { HomeIcon, SearchIcon } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
+import api from "../config/api";
+import toast from "react-hot-toast";
 
 export const SearchResults = () => {
 
@@ -16,9 +17,15 @@ export const SearchResults = () => {
   useEffect(() => {
     if (!query) return
     setIsLoading(true)
-    setSearchedProducts(products.filter((prod) => prod.name.toLowerCase().includes(query.toLowerCase())))
-    setIsLoading(false)
+
+    api.get(`/products?search=${encodeURIComponent(query)}`).then(({ data }) => {
+      setSearchedProducts(data.products)
+    }).catch((error: any) => {
+      toast.error(error.response?.data?.message || error.message)
+    }).finally(() => setIsLoading(false))
+
   }, [query])
+
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl px-4 sm:px-6 lg:px-8 mx-auto py-6">
@@ -41,7 +48,7 @@ export const SearchResults = () => {
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
               {
                 searchedProducts.map((product) => (
-                  <ProductCard key={product._id} product={product} />
+                  <ProductCard key={product.id} product={product} />
                 ))
               }
             </div>

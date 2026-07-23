@@ -4,82 +4,37 @@ import { Link, useNavigate } from "react-router-dom"
 import React, { useEffect, useState } from "react"
 import axios from "axios"
 import toast from "react-hot-toast"
+import { useAuth } from "../context/AuthContext"
 
 export const Login = () => {
 
-  const base_server_url = import.meta.env.VITE_BACKEND_URL
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL
+  const {login, register} = useAuth()
   const [isLogin, setIsLogin] = useState(true)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
+    setLoading(true)
 
-    if (isLogin) {
-      const userData = {
-        email,
-        password
+    try {      
+      if (isLogin) {
+        await login(email, password)
       }
-
-      try {
-
-        const data = await axios.post(base_server_url + "/auth/login", JSON.stringify(userData), {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
-
-
-        localStorage.setItem("auth_user", JSON.stringify(data.data.user))
-        localStorage.setItem("auth_token", JSON.stringify(data.data.token))
-        setEmail("")
-        setPassword("")
-        navigate("/")
-
-      } catch (error) {
-
-        if (axios.isAxiosError(error)) {
-          toast.error(error.response?.data.message || "Login Failed")
-        } else {
-          toast.error("Something went wrong")
-          console.log(error)
-        }
+  
+      else {
+        await register(name, email, password)
       }
+    } catch (error:any) {
+      console.error(error)
+      toast.error(error.response?.data?.message || error?.message)
     }
-
-    else {
-
-      try {
-
-        const userData = {
-          name,
-          email,
-          password
-        }
-        const data = await axios.post(base_server_url + "/auth/register", JSON.stringify(userData), {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
-
-        toast.success("Registered")
-        localStorage.setItem("auth_user", JSON.stringify(data.data.user))
-        localStorage.setItem("auth_token", JSON.stringify(data.data.token))
-        setName("")
-        setEmail("")
-        setPassword("")
-        navigate("/")
-
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          toast.error(error.response?.data.message || "Registration failed")
-        } else {
-          toast.error("Something went wrong")
-          console.log(error)
-        }
-      }
+    finally {
+      setLoading(false)
     }
   }
 

@@ -1,12 +1,12 @@
 import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, HomeIcon, LeafIcon, MinusIcon, PlusIcon, ShoppingCart, StarIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
-import { products } from "../assets/assets"
 import type { Product } from "../types/types"
 import { useCart } from "../context/CartContext"
 import { Loading } from "../components/Loading"
 import DummyReviewsSection from "../assets/DummyReviewsSection"
 import { ProductCard } from "../components/ProductCard"
+import api from "../config/api"
 
 export const ProductDetail = () => {
 
@@ -22,10 +22,13 @@ export const ProductDetail = () => {
   useEffect(() => {
     window.scrollTo(0, 0)
     setLocalQuantity(1)
-    const prod = products.find((item) => item._id === id)
-    setProduct(prod!) // here find can return undefined if it can't able to find item of that particular id and because our product is not expecting undefined as value then we cannot return undefined and that's why to bypass the undefine error given by typescript compiler we have just added ! exclamation mark after prod. ! is called non null assertion operator in ts which tells ts that at this moment prod is not undefined nor null  
-    setRelatedProducts(products.filter((item) => item._id !== id && item.category === prod?.category))
-    setLoading(false)
+
+    api.get(`/products/${id}`).then(({ data }) => {
+      setProduct(data.product)
+      return api.get(`/products?category=${data.product.category}`)
+    }).then(({ data }) => {
+      setRelatedProducts(data.products.filter((p: Product) => p.id !== product?.id))
+    }).catch(() => navigate("/products")).finally(() => setLoading(false))
   }, [id, navigate])
 
   if (loading) return (
@@ -35,7 +38,7 @@ export const ProductDetail = () => {
   )
 
   if (!product) return null
-  const cartItem = items.find((item) => item.product._id === id)
+  const cartItem = items.find((item) => item.product.id === id)
   const inCart = !!cartItem
 
   const displayQuantity = inCart ? cartItem.quantity : localQuantity
@@ -43,10 +46,10 @@ export const ProductDetail = () => {
   const handleMinus = () => {
     if (inCart) {
       if (cartItem.quantity > 1) {
-        updateQuantity(product._id, cartItem.quantity - 1)
+        updateQuantity(product.id, cartItem.quantity - 1)
       }
       else {
-        removeFromCart(product._id)
+        removeFromCart(product.id)
         setLocalQuantity(1)
       }
     }
@@ -56,7 +59,7 @@ export const ProductDetail = () => {
 
   const handlePlus = () => {
     if (inCart) {
-      updateQuantity(product._id, cartItem.quantity + 1)
+      updateQuantity(product.id, cartItem.quantity + 1)
     }
 
     else setLocalQuantity(localQuantity + 1)
@@ -200,7 +203,7 @@ export const ProductDetail = () => {
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 xl:gap-8">
                 {
                   relatedProducts.slice(0, 5).map((prod) => (
-                    <ProductCard key={prod._id} product={prod} />
+                    <ProductCard key={prod.id} product={prod} />
                   ))
                 }
               </div>

@@ -1,9 +1,24 @@
 import { ArrowRight } from "lucide-react"
 import { Link } from "react-router-dom"
 import { ProductCard } from "./ProductCard"
-import { products } from "../assets/assets"
+import { useEffect, useState } from "react"
+import api from "../config/api"
+import type { Product } from "../types/types"
+import toast from "react-hot-toast"
+// import { products } from "../assets/assets"
 
 export const PopularProducts = () => {
+
+    const [products, setProducts] = useState<Product[]>([])
+    useEffect(() => {
+        api.get("/products?sort=rating").then(({data}) => {
+            setProducts(data.products)
+        }).catch((error:any) => {
+            toast.error(error.response?.data.message || error.message)
+        })
+    }, [])
+
+    if(products.length > 0) console.log(products)
     return (
         <section className="pb-16">
             <div className="max-w-7xl mx-auto">
@@ -24,7 +39,7 @@ export const PopularProducts = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 xl:gap-8">
                     {
                         products.slice(0,10).map((product) => (
-                            <ProductCard key={product._id} product={product} />
+                            <ProductCard key={product.id} product={product} />
                         ))
                     }
                 </div>

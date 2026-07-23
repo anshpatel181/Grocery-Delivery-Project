@@ -16,11 +16,10 @@ import {
 import React, { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 export const Navbar = () => {
-  // const {user} = useAuth();
-  // const user:any = localStorage.getItem("auth_user")
-  const user: any = {isAdmin: true}
+  const {user, logout} = useAuth();
   const { cartCount, setIsCartOpen } = useCart()
   const [searchQuery, setSearchQuery] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -36,12 +35,10 @@ export const Navbar = () => {
   };
 
   const handleLogout = () => {
-    setIsMenuOpen(false);
-    setSearchQuery("")
-    localStorage.removeItem("auth_token")
-    localStorage.removeItem("auth_user")
-    navigate("/login")
-  };
+    logout()
+    setIsMenuOpen(false)
+    navigate("/")
+  }
 
   return (
     <nav className="bg-white sticky top-0 z-50 border border-b border-gray-200">
@@ -91,7 +88,7 @@ export const Navbar = () => {
                   className="flex items-center gap-2 p-2 cursor-pointer"
                 >
                   <div className="size-7 rounded-full bg-green-950 text-white flex items-center justify-center">
-                    J
+                    {user.name.trim()[0]}
                   </div>
                   {isMenuOpen ? (
                     <ChevronUpIcon className="size-3 text-zinc-500" />
@@ -131,10 +128,10 @@ export const Navbar = () => {
                     {user && (
                       <div className="px-4 py-2 border-b border-app-border">
                         <p className="text-sm font-medium text-zinc-900">
-                          John Doe
+                          {user.name.trim()}
                         </p>
                         <p className="text-xs text-zinc-500">
-                          john@example.com
+                          {user.email.trim()}
                         </p>
                       </div>
                     )}

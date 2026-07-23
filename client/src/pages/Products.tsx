@@ -2,10 +2,12 @@ import { ArrowRightIcon, ChevronDown, HomeIcon, SlidersHorizontalIcon, XIcon } f
 import { Link, useSearchParams } from "react-router-dom"
 import type { Product } from "../types/types"
 import { useEffect, useState } from "react"
-import { categoriesData, products } from "../assets/assets"
+import { categoriesData } from "../assets/assets"
 import { ProductCard } from "../components/ProductCard"
 import { FilterPanel } from "../components/FilterPanel"
 import { Loading } from "../components/Loading"
+import api from "../config/api"
+import toast from "react-hot-toast"
 
 export const Products = () => {
 
@@ -24,8 +26,16 @@ export const Products = () => {
 
   const fetchProducts = async () => {
     setLoading(true)
-    setProductsData(products.filter((item) => item.category === category || category === ""))
-    setLoading(false) 
+
+    try {
+      const { data } = await api.get(`products?category=${category}&minPrice=${minPrice}&maxPrice=${maxPrice}&sort=${sort}&page=${page}&limit=12`)
+      setProductsData(data.products)
+      setTotalPages(data.pages)
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const updateFilter = (key: string, value: string) => {
@@ -51,7 +61,7 @@ export const Products = () => {
 
   const clearFilters = () => setSearchParams({})
 
-  const activeCategory = categoriesData.find((cat) => cat.slug === category)
+  const activeCategory = productsData.find((cat) => cat.category === category)
   const hasFilters = category || minPrice || maxPrice || organic
 
   return (
@@ -78,7 +88,7 @@ export const Products = () => {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h1 className="text-2xl font-semibold text-app-green">{activeCategory ? activeCategory.name : "All Products"}</h1>
-                <p className="text-app-text-light text-sm">{products.length} products found</p>
+                <p className="text-app-text-light text-sm">{productsData.length} products found</p>
               </div>
 
               <div className="flex flex-col lg:items-center gap-3">
@@ -103,9 +113,9 @@ export const Products = () => {
 
             {/* Product grid */}
             {
-              loading ? 
+              loading ?
                 <Loading />
-               :
+                :
                 productsData.length === 0 ? (
                   <div className="text-center py-16">
                     <p className="text-lg font-semibold text-app-green mb-2">No Products found</p>
@@ -116,7 +126,7 @@ export const Products = () => {
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 xl:gap-8">
                     {
                       productsData.map((prod) => prod.stock > 0 && (
-                        <ProductCard key={prod._id} product={prod} />
+                        <ProductCard key={prod.id} product={prod} />
                       ))
                     }
                   </div>

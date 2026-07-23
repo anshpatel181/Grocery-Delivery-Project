@@ -7,7 +7,7 @@ declare global {
                 id: String,
                 isAdmin?: boolean
             }
-            partner?: DeliveryPartner
+            partner?: DeliveryPartner | null
         }
     }
 }

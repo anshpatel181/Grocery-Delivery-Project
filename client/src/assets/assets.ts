@@ -68,7 +68,7 @@ export const categoriesData = [
 
 export const products = [
   {
-    _id: "1",
+    id: "1",
     name: "Butter Croissant 100g",
     description: "Flaky, golden-brown pastry made with layers of pure French butter.",
     price: 45.0,
@@ -84,7 +84,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "2",
+    id: "2",
     name: "Organic Quinoa 500g",
     description: "Nutrient-dense, gluten-free whole grain packed with protein and essential amino acids.",
     price: 420.0,
@@ -100,7 +100,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "3",
+    id: "3",
     name: "Brown Bread 400g",
     description: "Freshly baked, wholesome sliced brown bread rich in dietary fiber.",
     price: 35.0,
@@ -116,7 +116,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "4",
+    id: "4",
     name: "Barley 1kg",
     description: "Premium quality whole barley grains, ideal for healthy soups, salads, and stews.",
     price: 140.0,
@@ -132,7 +132,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "5",
+    id: "5",
     name: "Knorr Cup Soup 70g",
     description: "Instant hot soup mix featuring rich flavors and a perfect blend of real vegetables.",
     price: 30.0,
@@ -148,7 +148,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "6",
+    id: "6",
     name: "Maggi Noodles 280g",
     description: "India's favorite instant noodles, packed with the classic taste of Masala spices.",
     price: 50.0,
@@ -164,7 +164,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "7",
+    id: "7",
     name: "Sprite 1.5L",
     description: "Crisp, clean, and refreshing lemon-lime flavored sparkling soda.",
     price: 60.0,
@@ -180,7 +180,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "8",
+    id: "8",
     name: "Carrot 500g",
     description: "Fresh, sweet, and crunchy orange carrots locally sourced and packed with Vitamin A.",
     price: 44.0,
@@ -196,7 +196,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "9",
+    id: "9",
     name: "Coca-Cola 1.5L",
     description: "The original sweet and refreshing sparkling cola drink to uplift your mood.",
     price: 75.0,
@@ -212,7 +212,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "10",
+    id: "10",
     name: "Brown Rice 1kg",
     description: "Unpolished long-grain brown rice, preserving natural fiber and vital nutrients.",
     price: 110.0,
@@ -228,7 +228,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "11",
+    id: "11",
     name: "Onion",
     description: "Fresh, pungent pink onions, a fundamental ingredient for every kitchen base.",
     price: 45.0,
@@ -244,7 +244,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "12",
+    id: "12",
     name: "Grapes",
     description: "Sweet and juicy seedless grapes, perfect for a healthy everyday snack.",
     price: 65.0,
@@ -260,7 +260,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "13",
+    id: "13",
     name: "Potato",
     description: "Versatile, earthy, farm-fresh potatoes ideal for baking, boiling, or frying.",
     price: 35.0,
@@ -276,7 +276,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "14",
+    id: "14",
     name: "Orange",
     description: "Tangy and bursting with citrus flavor, exceptionally high in Vitamin C.",
     price: 75.0,
@@ -292,7 +292,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "15",
+    id: "15",
     name: "Tomato",
     description: "Plump, ripe red tomatoes perfect for curries, fresh salads, and home sauces.",
     price: 28.0,
@@ -308,7 +308,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "16",
+    id: "16",
     name: "Spinach",
     description: "Crisp, leafy green spinach bunches rich in iron, calcium, and antioxidants.",
     price: 15.0,
@@ -324,7 +324,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "17",
+    id: "17",
     name: "Apple",
     description: "Sweet, crisp, hand-picked red apples for your daily dose of healthy nutrition.",
     price: 90.0,
@@ -340,7 +340,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "18",
+    id: "18",
     name: "Wheat Flour",
     description: "100% pure stone-ground whole wheat chakki atta for soft and fluffy rotis.",
     price: 230.0,
@@ -356,7 +356,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "19",
+    id: "19",
     name: "Fanta",
     description: "Bright and vibrant sparkling orange soda made with fruity, uplifting flavors.",
     price: 65.0,
@@ -372,7 +372,7 @@ export const products = [
     createdAt: "",
   },
   {
-    _id: "20",
+    id: "20",
     name: "7 Up",
     description: "Refreshing, caffeine-free lemon and lime flavored carbonated soft drink.",
     price: 70.0,
@@ -430,14 +430,20 @@ export const dummyAdminDashboardData = {
   recentOrders: [],
 }
 
-export const statusColors = [
+export const statusColors: Record<string, string> = {
+  Placed: "bg-blue-100 text-blue-800",
+  Confirmed: "bg-amber-100 text-amber-800",
+  Assigned: "bg-indigo-100 text-indigo-800",
+  Packed: "bg-cyan-100 text-cyan-800",
+  "Out for Delivery": "bg-purple-100 text-purple-800",
+  Delivered: "bg-green-100 text-green-800",
+  Cancelled: "bg-red-100 text-red-800"
+}
 
-]
+export const iconsForLeafpad = {
+ truck: "https://cdn-icons-png.flaticon.com/512/3097/3097180.png",
+    destination: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+}
 
-export const dummyDashboardOrdersData = [{
-
-}]
-
-export const dummyDeliveryPartnerData = [{
-  
-}]
+export const dummyDashboardOrdersData = [{}]
+export const dummyDeliveryPartnerData = [{}]

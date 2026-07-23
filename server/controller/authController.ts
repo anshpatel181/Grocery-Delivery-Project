@@ -26,7 +26,7 @@ export const register = async (req: Request, res: Response) => {
 
         const existingUser = await prisma.user.findUnique({ where: { email: email.toLowerCase() } })
 
-        if (existingUser) return res.status(400).json({ message: "User already exists with this email" })
+        if (existingUser) return res.status(400).json({ message: "User already exists" })
 
         const hashedPassword = await bcrypt.hash(password, 10)
 

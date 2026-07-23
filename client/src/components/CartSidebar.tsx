@@ -45,20 +45,20 @@ export const CartSidebar = () => {
                             </div>
                             :
                             items.map((item) => (
-                                <div className="relative flex items-center gap-3 bg-app-cream/60 rounded-xl p-3" key={item.product._id} >
+                                <div className="relative flex items-center gap-3 bg-app-cream/60 rounded-xl p-3" key={item.product.id} >
                                     <img src={item.product.image} alt={item.product.name} className="size-16 rounded-lg object-contain shrink-0" />
                                     <div className="flex-1 min-w-0">
                                         <h4 className="font-semibold text-sm truncate">{item.product.name}</h4>
                                         <p className="mt-0.5 text-xs text-app-text-light">{currency}{item.product.price.toFixed(2)} / {item.product.unit}</p>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3 mt-2">
-                                                <button onClick={() => updateQuantity(item.product._id, item.quantity - 1)} className="size-7 flex items-center justify-center border border-app-border rounded-lg bg-white"><MinusIcon className="size-3" /></button>
+                                                <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="size-7 flex items-center justify-center border border-app-border rounded-lg bg-white"><MinusIcon className="size-3" /></button>
                                                 <span className="text-sm font-semibold w-6 text-center">{item.quantity}</span>
-                                                <button onClick={() => updateQuantity(item.product._id, item.quantity + 1)} className="size-7 flex items-center justify-center border border-app-border rounded-lg bg-white"><PlusIcon className="size-3" /></button>
+                                                <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} className="size-7 flex items-center justify-center border border-app-border rounded-lg bg-white"><PlusIcon className="size-3" /></button>
                                             </div>
                                             <div className="flex items-center">
                                                 <span className="font-semibold">{currency}{(item.product.price * item.quantity).toFixed(2)}</span>
-                                                <button className="p-1 text-app-text-light hover:text-app-error transition-colors" onClick={() => removeFromCart(item.product._id)}>
+                                                <button className="p-1 text-app-text-light hover:text-app-error transition-colors" onClick={() => removeFromCart(item.product.id)}>
                                                     <Trash2Icon className="size-4" />
                                                 </button>
                                             </div>
